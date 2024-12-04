@@ -8,7 +8,8 @@ from azure.keyvault.secrets import SecretClient
 load_dotenv()
 
 TENANT_ID = os.getenv("TENANT_ID")
-CLIENT_ID = os.getenv("SP_ID_SECONDARY")
+CLIENT_ID_SP1 = os.getenv("SP_ID_PRINCIPAL")
+CLIENT_ID_SP2 = os.getenv("SP_ID_SECONDARY")
 SP_SECONDARY_PASSWORD = os.getenv("SP_SECONDARY_PASSWORD")
 KEYVAULT_URL = os.getenv("KEYVAULT_URL")
 SECRET_NAME = os.getenv("SECRET_NAME")
@@ -17,19 +18,21 @@ CONTAINER_NAME = os.getenv("CONTAINER_NAME")
 
 credential_sp2 = ClientSecretCredential(
         tenant_id=TENANT_ID,
-        client_id=CLIENT_ID,
+        client_id=CLIENT_ID_SP2,
         client_secret=SP_SECONDARY_PASSWORD
     )
 
 keyvault_swd_sp1 = SecretClient(vault_url=KEYVAULT_URL, credential=credential_sp2)
-credential_sp1 = keyvault_swd_sp1.get_secret(SECRET_NAME)._value
+credential_sp1 = keyvault_swd_sp1.get_secret(SECRET_NAME).value
+
+print(credential_sp1)
 
 
 def upload_file_to_datalake(file_path, directory_name, file_name):
 
     credential = ClientSecretCredential(
         tenant_id=TENANT_ID,
-        client_id=CLIENT_ID,
+        client_id=CLIENT_ID_SP1,
         client_secret=credential_sp1
     )
 
